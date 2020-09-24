@@ -1,24 +1,24 @@
-package dev.appsody.starter.health;
+package dev.appsody.orders.health;
 
 import javax.enterprise.context.ApplicationScoped;
 
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
-import org.eclipse.microprofile.health.Readiness;
+import org.eclipse.microprofile.health.Liveness;
 
-@Readiness
+@Liveness
 @ApplicationScoped
-public class StarterReadinessCheck implements HealthCheck {
+public class OrdersLivenessCheck implements HealthCheck {
 
-    private boolean isReady() {
-        // perform readiness checks, e.g. database connection, etc.
+    private boolean isAlive() {
+        // perform health checks here
 
         return true;
     }
 	
     @Override
     public HealthCheckResponse call() {
-        boolean up = isReady();
+        boolean up = isAlive();
         return HealthCheckResponse.named(this.getClass().getSimpleName()).state(up).build();
     }
     
