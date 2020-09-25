@@ -3,8 +3,12 @@
         <feature>microProfile-3.2</feature>
     </featureManager>
 
-    <httpEndpoint host="*" httpPort="${default.http.port}" 
+    <httpEndpoint host="*" httpPort="${default.http.port}"
         httpsPort="${default.https.port}" id="defaultHttpEndpoint"/>
-    
+
     <webApplication location="orders-ms-openliberty.war" contextRoot="/"/>
+
+    <ssl keyStoreRef="bcKeyStore"/>
+  	<keyStore id="bcKeyStore" location="/Users/Hemankita1/IBM/CN_Ref/auth-ms-openliberty/BCKeyStoreFile.jks" type="JKS" password="password" />
+
 </server>
