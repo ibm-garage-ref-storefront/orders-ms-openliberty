@@ -16,6 +16,13 @@
     <artifactId>orders-ms-openliberty</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
+    
+    <properties>
+        <jwt.id>myMpJwt</jwt.id>
+        <jwksUri>https://auth:9443/oidc/endpoint/OP/jwk</jwksUri>
+        <jwksIssuer>https://auth:9443/oidc/endpoint/OP</jwksIssuer>
+        <administratorRealm>user:https://auth:9443/oidc/endpoint/OP</administratorRealm>
+    </properties>
 
     <dependencies>
 
