@@ -11,23 +11,22 @@
 
     <webApplication location="orders-ms-openliberty.war" contextRoot="/">
         <!-- enable visibility to third party apis -->
-        <classloader apiTypeVisibility="api,ibm-api,spec,stable,third-party"/>
+        <!-- <classloader apiTypeVisibility="api,ibm-api,spec,stable,third-party"/> -->
+        <application-bnd>
+            <security-role name="admin">
+                <special-subject type="ALL_AUTHENTICATED_USERS"/>
+            </security-role>
+            <security-role name="user">
+                <special-subject type="ALL_AUTHENTICATED_USERS"/>
+            </security-role>
+        </application-bnd>
     </webApplication>
     
+    <ssl id="defaultSSLConfig" keyStoreRef="bcKeyStore" trustStoreRef="bcTrustStore"/>
+    <keyStore id="bcKeyStore" location="${server.config.dir}/resources/security/BCKeyStoreFile.p12" password="password"/>
+    <trustStore id="bcTrustStore" location="${server.config.dir}/resources/security/truststore.p12" password="password"/>
+
     <!--These values are defined in pom.xml-->
-    <mpJwt
-       id="${env.jwtid}"
-       jwksUri="${env.jwksUri}"
-       issuer="${env.jwksIssuer}">
-    </mpJwt>
-
-    <!--Credentials necessary to authorize user-->
-    <administrator-role>
-        <user-access-id>${env.administratorRealm}</user-access-id>
-    </administrator-role>
-
-    <ssl keyStoreRef="bcKeyStore" trustStoreRef="bcTrustStore"/>
-  	<keyStore id="bcKeyStore" location="/Users/Hemankita1/IBM/CN_Ref/auth-ms-openliberty/BCKeyStoreFile.jks" type="JKS" password="password" />
-    <trustStore id="bcTrustStore" location="/Users/Hemankita1/IBM/CN_Ref/auth-ms-openliberty/truststore.jks" type="JKS" password="password"/>
-
+    <mpJwt id="jwtUserConsumer" keyName="bckey" issuer="${env.jwksIssuer}" signatureAlgorithm="RS256" sslRef="defaultSSLConfig"/>
+    
 </server>
