@@ -18,10 +18,7 @@
     <packaging>war</packaging>
     
     <properties>
-        <jwt.id>myMpJwt</jwt.id>
-        <jwksUri>https://auth:9443/oidc/endpoint/OP/jwk</jwksUri>
-        <jwksIssuer>https://auth:9443/oidc/endpoint/OP</jwksIssuer>
-        <administratorRealm>user:https://auth:9443/oidc/endpoint/OP</administratorRealm>
+        <jwksIssuer>https://localhost:9444/oidc/endpoint/OP</jwksIssuer>
     </properties>
 
     <dependencies>
@@ -40,6 +37,11 @@
             <artifactId>jakarta.jakartaee-api</artifactId>
             <version>8.0.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.16</version>
         </dependency>
 
         <!-- For tests -->
