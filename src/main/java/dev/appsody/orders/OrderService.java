@@ -1,26 +1,22 @@
 package dev.appsody.orders;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import javax.annotation.security.DeclareRoles;
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -71,6 +67,44 @@ public class OrderService {
         }
 
     }
+    
+
+    @GET
+//  @RolesAllowed({"admin","user"})
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
+    public Response getOrdersById(@PathParam("id") String id) throws Exception {
+	    try {
+	    	if (jwt == null) {
+	    		// distinguishing lack of jwt from a poorly generated one
+	    		return Response.status(Response.Status.BAD_REQUEST).entity("Missing JWT").build();
+	    	}
+	    	else {
+	    		System.out.println("MP JWT config message: " + jwt.getName() );
+	    		System.out.println("MP JWT getIssuedAtTime " + jwt.getIssuedAtTime() );
+	    	}
+	          
+	    	final String customerId = jwt.getName();
+	          
+	    	if (customerId == null) {
+	              // if no user passed in, this is a bad request
+	              // return "Invalid Bearer Token: Missing customer ID";
+	              return Response.status(Response.Status.BAD_REQUEST).entity("Invalid Bearer Token: Missing customer ID from jwt: " + jwt.getRawToken()).build();
+	        }
+	
+	    	System.out.println("caller: " + customerId);
+	    	OrderDAOImpl ordersRepo = new OrderDAOImpl();
+	    	final List<Order> orders = ordersRepo.findByOrderId(id);
+	          
+	    	return Response.ok(orders).build();
+	      
+	    } 
+	    catch (Exception e) { 
+	    	System.err.println(e.getMessage() + "" + e);
+	    	throw new Exception(e.toString());
+	    }
+
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -104,9 +138,10 @@ public class OrderService {
 
             UriBuilder builder = uriInfo.getAbsolutePathBuilder();
             builder.path(payload.getId());
+           
             System.out.println(builder.build().toString());
             
-            return javax.ws.rs.core.Response.created(builder.build()).build();
+            return Response.created(builder.build()).entity(payload).build();
 
         } catch (Exception ex) {
             System.err.println("Error creating order: " + ex);
