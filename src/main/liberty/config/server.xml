@@ -9,9 +9,9 @@
     <!-- Automatically expand WAR files and EAR files -->
     <applicationManager autoExpand="true"/>
 
-    <webApplication location="orders-ms-openliberty.war" contextRoot="/">
-        <!-- enable visibility to third party apis -->
-        <!-- <classloader apiTypeVisibility="api,ibm-api,spec,stable,third-party"/> -->
+    <webApplication name="orders-ms-openliberty" location="orders-ms-openliberty.war" contextRoot="/">
+        <!-- enable visibility to third party apis opentracing -->
+        <classloader apiTypeVisibility="+third-party" />
         <application-bnd>
             <security-role name="admin">
                 <special-subject type="ALL_AUTHENTICATED_USERS"/>

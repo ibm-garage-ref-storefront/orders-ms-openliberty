@@ -214,11 +214,27 @@ CONTAINER ID        IMAGE                           COMMAND                  CRE
 
 - Before running the application, make sure you set up the custom keystore properly.
 
+- Set up Jaegar for opentracing. This is optional. If you want to enable distributed tracing your application, run this step.
+
+```
+ docker run -d --name jaeger   -e COLLECTOR_ZIPKIN_HTTP_PORT=9411   -p 5775:5775/udp   -p 6831:6831/udp   -p 6832:6832/udp   -p 5778:5778   -p 16686:16686   -p 14268:14268   -p 9411:9411   jaegertracing/all-in-one:1.11
+```
+
 - To run the orders application, run the below command.
 
 ```
-appsody run --docker-options "-e jdbcURL=jdbc:mysql://host.docker.internal:3307/ordersdb?useSSL=true -e dbuser=dbuser -e dbpassword=password -e jwksIssuer="https://localhost:9444/oidc/endpoint/OP" "
+appsody run --docker-options "-e jdbcURL=jdbc:mysql://<docker_host>:3307/ordersdb?useSSL=true -e dbuser=<database user name> -e dbpassword=<database password> -e jwksIssuer="https://localhost:9444/oidc/endpoint/OP" -e JAEGER_SERVICE_NAME=catalog-ms-openliberty -e JAEGER_AGENT_HOST=host.docker.internal -e JAEGER_AGENT_PORT=6831 -e JAEGER_REPORTER_LOG_SPANS=true -e JAEGER_REPORTER_FLUSH_INTERVAL=2000 -e JAEGER_SAMPLER_TYPE=const -e JAEGER_SAMPLER_PARAM=1"
 ```
+
+For instance <docker_host>, it will be `host.docker.internal`, <database user name> will be `dbuser` and <database password> will be `password`.
+
+If not running Jaegar, run the below command.
+
+```
+appsody run --docker-options "-e jdbcURL=jdbc:mysql://<docker_host>:3307/ordersdb?useSSL=true -e dbuser=<database user name> -e dbpassword=<database password> -e jwksIssuer="https://localhost:9444/oidc/endpoint/OP" "
+```
+
+For instance <docker_host>, it will be `host.docker.internal`, <database user name> will be `dbuser` and <database password> will be `password`.
 
 - If it is successfully running, you will see something like below.
 
@@ -308,6 +324,21 @@ If it is running successfully, you will see something like below.
 $ curl -k --request GET   --url https://localhost:9443/micro/orders   --header 'Authorization: Bearer eyJraWQiOiJ0aDVYaWg2Z0NQLV83d2pyN2FtOF8yVURnbGxQc28xT1pjNlpMcmhJdmZJIiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJmb28iLCJ0b2tlbl90eXBlIjoiQmVhcmVyIiwic2NvcGUiOlsib3BlbmlkIl0sImp0aSI6IlFqVFZUWE1KNk9USHlqTnIiLCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo5NDQ0L29pZGMvZW5kcG9pbnQvT1AiLCJleHAiOjE2MDMyMDUzMjUsImlhdCI6MTYwMzE5ODEyNSwiZ3JvdXBzIjpbIlVzZXJzIl0sInVwbiI6ImZvbyJ9.k4mCqokWHFQMmyZF7Fu4iXMHdq77k6IDcgwH5Pm1UidIWz_Xi05c-vSgKkmLUR6xkbDnd5-9YslxrRotYNupMiHlc4lG0M3KYwFJrwVjphMQ8bXYmreILjQQqEj4GN-cJzR83N5Kt5y7y3ScBsdrlGeOO2Z-AUcSyzZBHVKNedwJElZo8idzLRaqldCYnSz6tr9krlED70XgRH9f4ea2hjtWh2VRZgcg2H1b1Z35U-LuqnUWO4uTrzOgerz0hBeDibcNOXZVMAH-KOxuyhGwEddUfaWeF3fIwkRW8NJtHiPI4wdL4OjbGwx_D4NtaZwodVtD-4PdC651JDtuwuaa-Q'   --header 'Content-Type: application/json'
 [{"count":1,"customerId":"foo","date":"2020-10-20T12:06:09Z[UTC]","id":"bb8c0512-f03a-46b1-b2c2-59813bdb49ce","itemId":13401}]
 ```
+
+If enabled Jaegar, access it at http://localhost:16686/ and point the service to `orders-ms-openliberty` to access the traces.
+
+![Jaegar UI](./static/jaegar_ui_orders.png)
+
+![Jaegar traces](./static/jaegar_traces.png)
+
+Also openapi is enabled.
+
+    - http://localhost:9080/openapi/ui/
+    - http://localhost:9080/index.html
+    - http://localhost:9080/health
+    - http://localhost:9080/openapi
+
+![Openapi UI](./static/openapi-ui.png)
 
 ### Exiting the application
 

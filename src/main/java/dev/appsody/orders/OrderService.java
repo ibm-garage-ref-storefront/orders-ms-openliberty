@@ -21,9 +21,11 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.eclipse.microprofile.opentracing.Traced;
 
 import dev.appsody.orders.model.Order;
 import dev.appsody.orders.utils.OrderDAOImpl;
+import io.opentracing.Tracer;
 
 @RequestScoped
 @Path("/orders")
@@ -31,10 +33,12 @@ public class OrderService {
 
     @Inject
     private JsonWebToken jwt;
+    
+    @Inject Tracer tracer;
 
     @GET
-//    @RolesAllowed({"admin","user"})
     @Produces(MediaType.APPLICATION_JSON)
+    @Traced(value = true, operationName = "getAllOrders")
     public Response getOrders() throws Exception {
         try {
             if (jwt == null) {
@@ -70,9 +74,9 @@ public class OrderService {
     
 
     @GET
-//  @RolesAllowed({"admin","user"})
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
+    @Traced(value = true, operationName = "getOrdersByID")
     public Response getOrdersById(@PathParam("id") String id) throws Exception {
 	    try {
 	    	if (jwt == null) {
@@ -109,7 +113,7 @@ public class OrderService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-//    @RolesAllowed({ "admin" })
+    @Traced(value = true, operationName = "createOrders")
     public Response create(
         Order payload, @Context UriInfo uriInfo) throws IOException, TimeoutException {
         try {
