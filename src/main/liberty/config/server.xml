@@ -3,8 +3,30 @@
         <feature>microProfile-3.2</feature>
     </featureManager>
 
-    <httpEndpoint host="*" httpPort="${default.http.port}" 
+    <httpEndpoint host="*" httpPort="${default.http.port}"
         httpsPort="${default.https.port}" id="defaultHttpEndpoint"/>
+        
+    <!-- Automatically expand WAR files and EAR files -->
+    <applicationManager autoExpand="true"/>
+
+    <webApplication name="orders-ms-openliberty" location="orders-ms-openliberty.war" contextRoot="/">
+        <!-- enable visibility to third party apis opentracing -->
+        <classloader apiTypeVisibility="+third-party" />
+        <application-bnd>
+            <security-role name="admin">
+                <special-subject type="ALL_AUTHENTICATED_USERS"/>
+            </security-role>
+            <security-role name="user">
+                <special-subject type="ALL_AUTHENTICATED_USERS"/>
+            </security-role>
+        </application-bnd>
+    </webApplication>
     
-    <webApplication location="starter-app.war" contextRoot="/"/>
+    <ssl id="defaultSSLConfig" keyStoreRef="bcKeyStore" trustStoreRef="bcTrustStore"/>
+    <keyStore id="bcKeyStore" location="${server.config.dir}/resources/security/BCKeyStoreFile.p12" password="password"/>
+    <trustStore id="bcTrustStore" location="${server.config.dir}/resources/security/truststore.p12" password="password"/>
+
+    <!--These values are defined in pom.xml-->
+    <mpJwt id="jwtUserConsumer" keyName="bckey" issuer="${env.jwksIssuer}" signatureAlgorithm="RS256" sslRef="defaultSSLConfig"/>
+    
 </server>

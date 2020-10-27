@@ -1,4 +1,4 @@
-package it.dev.appsody.starter;
+package it.dev.appsody.orders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -13,15 +13,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class EndpointTest {
+public class HealthEndpointTest {
     
     private static String baseUrl;
-    private static final String RESOURCE_ENDPOINT = "/starter/resource";
+    private static final String LIVENESS_ENDPOINT = "/health/live";
+    private static final String READINESS_ENDPOINT = "/health/ready";
     private Client client;
     private Response response;
     
     @BeforeAll
     public static void oneTimeSetup() {
+        // Get test port property defined in pom.xml
         String port = System.getProperty("liberty.test.port");
         baseUrl = "http://localhost:" + port;
     }
@@ -40,18 +42,31 @@ public class EndpointTest {
     }
 
     @Test
-    public void testResourceEndpoint() {
-        checkEndpoint(RESOURCE_ENDPOINT, "StarterResource response");
+    public void testLivenessEndpoint() {
+        checkHealthEndpoint(LIVENESS_ENDPOINT, "alive");
+
+    }
+    
+    @Test
+    public void testReadinessEndpoint() {
+        checkHealthEndpoint(READINESS_ENDPOINT, "ready");
 
     }
 
-    private void checkEndpoint(String endpoint, String expectedResponseText) {
-        String resourceUrl = baseUrl + endpoint;
-        response = this.getResponse(resourceUrl);
-        this.assertResponse(resourceUrl, response);
+    private void checkHealthEndpoint(String endpoint, String state) {
+        String healthURL = baseUrl + endpoint;
+        response = this.getResponse(healthURL);
+        this.assertResponse(healthURL, response);
         
-        String responseText = response.readEntity(String.class);
-        assertEquals(expectedResponseText, responseText, "Endpoint response text is not correct");
+        JsonObject healthJson = response.readEntity(JsonObject.class);
+        
+        String expectedOutcome = "UP";
+        String actualOutcome = healthJson.getString("status");
+        assertEquals(expectedOutcome, actualOutcome, "Application should be " + state);
+        
+        actualOutcome = healthJson.getJsonArray("checks").getJsonObject(0).getString("status");
+        assertEquals(expectedOutcome, actualOutcome, "First array element was expected to be SystemResource and it wasn't healthy");
+    
     }
     
     /**
