@@ -217,7 +217,7 @@ CONTAINER ID        IMAGE                           COMMAND                  CRE
 - To run the orders application, run the below command.
 
 ```
-appsody run --docker-options "-e jdbcURL=jdbc:mysql://host.docker.internal:3307/ordersdb?useSSL=true -e dbuser=dbuser -e dbpassword=password -e jwksIssuer="https://localhost:9444/oidc/endpoint/OP"
+appsody run --docker-options "-e jdbcURL=jdbc:mysql://host.docker.internal:3307/ordersdb?useSSL=true -e dbuser=dbuser -e dbpassword=password -e jwksIssuer="https://localhost:9444/oidc/endpoint/OP" "
 ```
 
 - If it is successfully running, you will see something like below.
